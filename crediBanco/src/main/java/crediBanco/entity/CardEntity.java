@@ -22,8 +22,8 @@ public class CardEntity {
     @Column(name = "id_card", nullable = false, length = 16)
     private String idCard;
 
-    @Column(name = "expiration_date", nullable = false)
-    private Date expirationDate;
+    @Column(name = "expiration_date", nullable = false, length = 7)
+    private String expirationDate;
 
     @Column(name = "balance", nullable = false)
     private Double balance;

@@ -42,7 +42,9 @@ public class ErrorDetailApiResponse {
             new ErrorDetailApiResponse(402, "INSUFFICIENT_FUNDS_STATE", "La cuenta asociada a la tarjeta generada no tiene suficientes fondos para activar la tarjeta."),
             new ErrorDetailApiResponse(401, "INVALID_PIN_STATE", "Se intentó activar la tarjeta con un PIN incorrecto."),
             new ErrorDetailApiResponse(498, "EXPIRED_TOKEN_STATE", "El token de autenticación proporcionado para activar la tarjeta ha expirado."),
-            new ErrorDetailApiResponse(422, "INVALID_ACCOUNT_TYPE_STATE", "El tipo de cuenta asociada a la tarjeta no es válido o no está permitido para la activación de tarjetas.")
+            new ErrorDetailApiResponse(422, "INVALID_ACCOUNT_TYPE_STATE", "El tipo de cuenta asociada a la tarjeta no es válido o no está permitido para la activación de tarjetas."),
+            new ErrorDetailApiResponse(409, "UPDATE_RECORD_ERROR", "Error al activar la tarjeta. No se encontró ninguna tarjeta con el ID proporcionado.")
+
     );
 }
 

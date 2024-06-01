@@ -4,6 +4,8 @@ import crediBanco.entity.CardEntity;
 import crediBanco.model.response.ApiResponse;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ValidationUtil {
@@ -16,58 +18,13 @@ public class ValidationUtil {
     }
 
 
-    /*convertir Entity en Map*/
-    public static Map<String, Object> convertEntityToMap(Object obj , String nameData) {
-        Map<String, Object> result = new HashMap<>();
-        if (obj instanceof List<?>) {
-            List<Map<String, Object>> dataList = new ArrayList<>();
-            for (Object entity : (List<?>) obj) {
-                dataList.add(convertSingleEntityToMap(entity));
-            }
-            result.put(nameData, dataList);
-        } else {
-            result.put(nameData, convertSingleEntityToMap(obj));
-        }
 
-        return result;
-    }
-
-    private static Map<String, Object> convertSingleEntityToMap(Object obj) {
-        Map<String, Object> entityMap = new HashMap<>();
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                Object value = field.get(obj);
-                String key = field.getName();
-
-                if (!shouldExcludeField(key) && value != null) {
-                    if ("idCard".equals(key)) {
-                        entityMap.put(key, recortarTarjeta(value.toString())); // Ensure String conversion
-                    } else {
-                        entityMap.put(key, value);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return entityMap;
-    }
-
-    private static boolean shouldExcludeField(String fieldName) {
-        return "expirationDate".equals(fieldName) || "state".equals(fieldName)
-                || "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
-    }
-    /*convertir Entity en Map*/
-
-    public static String recortarTarjeta(String cadena) {
+    public  String recortarTarjeta(String cadena) {
         if (cadena.length() <= 4) {
-            return cadena; // La cadena ya tiene la longitud deseada
+            return "************"+cadena; // La cadena ya tiene la longitud deseada
         } else {
             // Mostrar solo los últimos 4 caracteres
-            return cadena.substring(cadena.length() - 4);
+            return "**********"+cadena.substring(cadena.length() - 4);
         }
     }
 
@@ -102,4 +59,27 @@ public class ValidationUtil {
         }
         return null;
     }
+
+
+    public  String generateCardNumber(String productId) {
+        Random random = new Random();
+        StringBuilder cardNumber = new StringBuilder(productId);
+        for (int i = 0; i < 10; i++) {
+            cardNumber.append(random.nextInt(10));
+        }
+        return cardNumber.toString();
+    }
+
+
+    public  String getFutureDateWithFormat() {
+        // Obtener la fecha actual
+        LocalDate currentDate = LocalDate.now();
+        // Añadir 3 años a la fecha actual
+        LocalDate futureDate = currentDate.plusYears(3);
+        // Crear un formateador para el formato "MM/yyyy"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+        // Formatear la fecha futura
+        return futureDate.format(formatter);
+    }
+
 }
