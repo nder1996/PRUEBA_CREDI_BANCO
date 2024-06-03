@@ -3,7 +3,12 @@ package crediBanco.service;
 
 import crediBanco.model.response.ApiResponse;
 import crediBanco.model.response.ErrorDetailApiResponse;
+import crediBanco.repository.CardRepository;
+import crediBanco.repository.TransactionRepository;
 import crediBanco.util.ValidationUtil;
+import crediBanco.util.ValidationUtilCard;
+import crediBanco.util.ValidationUtilTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -14,12 +19,8 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
 
 
 
-    private final ValidationUtil validationUtil;
-
-    // Constructor donde se inyecta la dependencia de ValidationUtil
-    public ResponseApiBuilderService(ValidationUtil validationUtil) {
-        this.validationUtil = validationUtil;
-    }
+    private final ValidationUtilCard validationUtilCard = new ValidationUtilCard();
+    private final ValidationUtilTransaction ValidationUtilTransaction = new ValidationUtilTransaction();
 
 
 
@@ -51,7 +52,7 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
         Map<String, Object> metaJson = new HashMap<>();
         Map<String, Object> dataJson = new HashMap<>();
         try {
-            metaJson = this.metaRespuestaServidor("Operación exitosa",200);
+            metaJson = this.metaRespuestaServidor("Operación Exitosa",200);
             ApiResponse<String> successResponse = new ApiResponse<>(data, metaJson, null);
             return successResponse;
         } catch (Exception ex) {
@@ -86,9 +87,10 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
             meta.put("message", message);
             meta.put("status", status);
             response.put("meta", meta);
+
             return meta;
         }catch (Exception ex) {
-            System.out.println("Error al crear la respuesta del servidor : "+ex.getMessage());
+            System.out.println("Error al crear el json Meta en la respuesta del servidor : "+ex.getMessage());
             return null;
         }
     }
@@ -111,7 +113,7 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
         return result;
     }
 
-    private Map<String, Object> convertSingleEntityToMap(Object obj) {
+    public Map<String, Object> convertSingleEntityToMap(Object obj) {
         Map<String, Object> entityMap = new HashMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -119,11 +121,11 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
                 field.setAccessible(true);
                 Object value = field.get(obj);
                 String key = field.getName();
-
-                if (!shouldExcludeField(key) && value != null) {
-                    if ("idCard".equals(key)) {
-                        entityMap.put(key,this.validationUtil.recortarTarjeta(value.toString())); // Ensure String conversion
-                    } else {
+                if (!shouldExcludeFieldFecha(key) && value != null) {
+                    if ("state".equals(key)) {
+                        String estadoConvertido = convertirEstado(value.toString());
+                        entityMap.put(key, estadoConvertido);
+                    } else if (!shouldExcludeFieldFecha(key)) {
                         entityMap.put(key, value);
                     }
                 }
@@ -131,39 +133,34 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
                 e.printStackTrace();
             }
         }
-
         return entityMap;
     }
 
 
 
-    public  Map<String, Object> convertEntityToMapSinCambios(Object obj , String nameData) {
+    public Map<String, Object> convertEntityToMapSinCambios(Object obj, String nameData) {
         Map<String, Object> result = new HashMap<>();
+
         if (obj instanceof List<?>) {
             List<Map<String, Object>> dataList = new ArrayList<>();
             for (Object entity : (List<?>) obj) {
                 dataList.add(convertSingleEntityToMapSinCambios(entity));
             }
             result.put(nameData, dataList);
-        }   else if (obj instanceof Object && !(obj instanceof Map<?, ?>)){ // Aquí reemplaza ? con el tipo que desees considerar
-            result.put(nameData, convertSingleEntityToMapSinCambios(obj));
-        }
-         if (obj instanceof Map<?, ?>) {
-            // Verificar que todas las claves sean instancias de String
-            boolean allKeysAreStrings = ((Map<?, ?>) obj).keySet().stream().allMatch(key -> key instanceof String);
-            // Verificar que todos los valores sean instancias de Object
-            boolean allValuesAreObjects = ((Map<?, ?>) obj).values().stream().allMatch(value -> value instanceof Object);
-            if (allKeysAreStrings && allValuesAreObjects) {
-                result.put(nameData, obj);
+        } else if (obj instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            if (map.keySet().stream().allMatch(key -> key instanceof String) &&
+                    map.values().stream().allMatch(value -> value instanceof Object)) {
+                result.put(nameData, map);
             }
         } else {
             result.put(nameData, convertSingleEntityToMapSinCambios(obj));
         }
+
         return result;
     }
 
-
-    private Map<String, Object> convertSingleEntityToMapSinCambios(Object obj) {
+    public Map<String, Object> convertSingleEntityToMapSinCambios(Object obj) {
         Map<String, Object> entityMap = new HashMap<>();
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -190,17 +187,17 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
 
 
 
-    private static boolean shouldExcludeField(String fieldName) {
+    public  boolean shouldExcludeField(String fieldName) {
         return "expirationDate".equals(fieldName) || "state".equals(fieldName)
                 || "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
     }
 
-    private static boolean shouldExcludeFieldFecha(String fieldName) {
+    public  boolean shouldExcludeFieldFecha(String fieldName) {
         return  "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
     }
 
 
-    private String convertirEstado(String estado) {
+    public String convertirEstado(String estado) {
         switch (estado) {
             case "I":
                 return "INACTIVO";
@@ -208,6 +205,10 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
                 return "ACTIVO";
             case "B":
                 return "BLOQUEADO";
+            case "S":
+                return "ACTIVO";
+            case "N":
+                return "ANULADO";
             default:
                 return estado; // En caso de que el estado no sea I, A o B, se retorna el mismo valor original
         }

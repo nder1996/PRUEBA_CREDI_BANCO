@@ -17,11 +17,19 @@ public interface CardRepository extends JpaRepository<CardEntity, String> {
 
 
     @Modifying
-    @Query(value = "UPDATE CARD SET state = 'A' WHERE id_card = :idCard", nativeQuery = true)
+    @Query(value = "UPDATE CARD SET state = 'A' , updated_at = NOW()  WHERE id_card = :idCard", nativeQuery = true)
     Integer activeCard(@Param("idCard") String idCard);
 
     @Modifying
-    @Query(value = "UPDATE CARD SET state = 'B' WHERE id_card = :idCard", nativeQuery = true)
+    @Query(value = "UPDATE CARD SET state = 'B' , updated_at = NOW()   WHERE id_card = :idCard", nativeQuery = true)
     Integer blockCard(@Param("idCard") String idCard);
+
+    @Modifying
+    @Query(value = "UPDATE CARD SET balance = :balance , updated_at = NOW()   WHERE id_card = :idCard and state = 'A'", nativeQuery = true)
+    Integer reloadBalance(@Param("idCard") String idCard , @Param("balance") Double balance);
+
+    @Query(value = "select * from CARD where id_card = :idCard and  state = 'A'", nativeQuery = true)
+    CardEntity getByIdCard(@Param("idCard") String idCard);
+
 
 }

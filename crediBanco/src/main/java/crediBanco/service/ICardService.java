@@ -17,4 +17,12 @@ public interface ICardService {
     public ApiResponse<String> generateCard(String productId);
 
     public ApiResponse<String> activateCard(Map<String, Object> requestData);
+
+    public ApiResponse<String> blockCard(String idCard);
+
+    public ApiResponse<String> reloadBalanceCard(Map<String, Object> requestData);
+
+    public ApiResponse<String> getByCardBalance(String idCard);
+
+
 }

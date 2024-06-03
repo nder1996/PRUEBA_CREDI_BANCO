@@ -19,7 +19,7 @@ public class TransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transaction", nullable = false)
+    @Column(name = "id_transaction")
     /*@NotNull(message = "Transaction ID cannot be null")*/
     private Integer idTransaction;
 
@@ -31,9 +31,9 @@ public class TransactionEntity {
     /*@NotBlank(message = "State cannot be blank")*/
     private String state;
 
-    @Column(name = "card_id", nullable = false, length = 16)
-   /* @NotBlank(message = "Card ID cannot be blank")*/
-    private String cardId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "card_id", nullable = false)
+    private CardEntity card;
 
     @Column(name = "price", nullable = false)
   /*  @NotNull(message = "Price cannot be null")*/

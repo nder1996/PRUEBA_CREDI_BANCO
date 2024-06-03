@@ -18,34 +18,16 @@ public class ErrorDetailApiResponse {
     private  String codeDescripcion;
 
     public static final List<ErrorDetailApiResponse> ERRORS = Arrays.asList(
-            new ErrorDetailApiResponse(400, "INVALID_CARD_NUMBER", "El número de tarjeta proporcionado es inválido."),
-            new ErrorDetailApiResponse(401, "CARD_EXPIRED", "La tarjeta de crédito o débito utilizada para la transacción ha expirado."),
-            new ErrorDetailApiResponse(402, "INSUFFICIENT_FUNDS", "No hay suficientes fondos en la cuenta para completar la transacción."),
-            new ErrorDetailApiResponse(403, "EXCEEDS_DAILY_LIMIT", "La transacción excede el límite diario de transacciones o el monto de la transacción."),
-            new ErrorDetailApiResponse(404, "DUPLICATE_TRANSACTION", "La transacción ya ha sido procesada."),
-            new ErrorDetailApiResponse(500, "INTERNAL_ERROR", "Ha ocurrido un error interno en el servidor durante el procesamiento de la transacción."),
-            new ErrorDetailApiResponse(404, "ACCOUNT_NOT_FOUND", "La cuenta especificada no existe."),
-            new ErrorDetailApiResponse(423, "ACCOUNT_LOCKED", "La cuenta ha sido bloqueada debido a demasiados intentos de inicio de sesión fallidos."),
-            new ErrorDetailApiResponse(401, "INVALID_PIN", "El PIN proporcionado es incorrecto."),
-            new ErrorDetailApiResponse(401, "INVALID_CREDENTIALS", "Las credenciales proporcionadas son inválidas."),
-            new ErrorDetailApiResponse(498, "EXPIRED_TOKEN", "El token de autenticación proporcionado ha expirado."),
-            new ErrorDetailApiResponse(422, "INVALID_ACCOUNT_TYPE", "El tipo de cuenta especificado no es válido o no está permitido para la operación solicitada."),
-            new ErrorDetailApiResponse(403, "UNAUTHORIZED_ACCESS", "Se ha intentado acceder a un recurso sin la autorización adecuada."),
-            new ErrorDetailApiResponse(405, "TRANSACTION_NOT_PERMITTED", "La transacción solicitada no está permitida para la cuenta o el usuario."),
-            new ErrorDetailApiResponse(429, "RATE_LIMIT_EXCEEDED", "Se ha superado el límite de solicitudes permitidas en un período de tiempo determinado."),
-            new ErrorDetailApiResponse(422, "INVALID_CARD_NUMBER_CREATION", "El número de tarjeta generado es inválido."),
-            new ErrorDetailApiResponse(410, "CARD_EXPIRED_CREATION", "La fecha de expiración de la tarjeta generada está en el pasado."),
-            new ErrorDetailApiResponse(422, "INVALID_CARD_TYPE", "El tipo de tarjeta generado no es válido o no está permitido para el servicio ofrecido."),
-            new ErrorDetailApiResponse(409, "DUPLICATE_CARD", "Se intentó generar una tarjeta que ya existe en el sistema."),
-            new ErrorDetailApiResponse(500, "INTERNAL_ERROR_CREATION", "Ha ocurrido un error interno en el servidor durante la generación de la tarjeta."),
-            new ErrorDetailApiResponse(423, "ACCOUNT_LOCKED_STATE", "La cuenta asociada a la tarjeta generada está bloqueada."),
-            new ErrorDetailApiResponse(402, "INSUFFICIENT_FUNDS_STATE", "La cuenta asociada a la tarjeta generada no tiene suficientes fondos para activar la tarjeta."),
-            new ErrorDetailApiResponse(401, "INVALID_PIN_STATE", "Se intentó activar la tarjeta con un PIN incorrecto."),
-            new ErrorDetailApiResponse(498, "EXPIRED_TOKEN_STATE", "El token de autenticación proporcionado para activar la tarjeta ha expirado."),
-            new ErrorDetailApiResponse(422, "INVALID_ACCOUNT_TYPE_STATE", "El tipo de cuenta asociada a la tarjeta no es válido o no está permitido para la activación de tarjetas."),
-            new ErrorDetailApiResponse(409, "UPDATE_RECORD_ERROR", "Error al activar la tarjeta. No se encontró ninguna tarjeta con el ID proporcionado.")
+            new ErrorDetailApiResponse(400, "INVALID_CARD_NUMBER", "El número de tarjeta que ingresaste no es válido"),
+            new ErrorDetailApiResponse(400, "INSUFFICIENT_FUNDS", "No tienes suficiente dinero en tu cuenta para realizar la transacción"),
+            new ErrorDetailApiResponse(400, "UPDATE_RECORD_ERROR", "Hubo un error al intentar actualizar la información solicitada"),
+            new ErrorDetailApiResponse(400, "INVALID_FORMAT_INPUT", "la informacion ingresada no corresponde con el formato solicitado"),
+            new ErrorDetailApiResponse(400, "INTERNAL_SERVER_ERROR", "Ocurrió un error en el servidor"),
+            new ErrorDetailApiResponse(400, "UPDATE_RECORD_ERROR_CARD", "Hubo un error al momento de recargar la tarjeta"),
+            new ErrorDetailApiResponse(400, "NO_DATA_AVAILABLE", "No se encontraron registros que coincidan con los datos proporcionados."),
+            new ErrorDetailApiResponse(400, "ERROR_CREATE_TRANSACTION", "Error al crear una transaction")
+            );
 
-    );
 }
 
 
