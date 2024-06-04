@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -71,7 +72,10 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
                 transactionEntity.setState("S");
                 transactionEntity.setPrice(priceTotal);
                 transactionEntity.setTransactionDate(new Date());
-                if(card.getBalance()>0 && card.getBalance()>priceTotal){
+                if(card.getBalance()>0 && card.getBalance()>=priceTotal){
+                    Double saldoCard = card.getBalance() - transactionEntity.getPrice();
+                    card.setBalance(saldoCard);
+                    this.cardRepository.saveAndFlush(card);
                     TransactionEntity transaction =  this.transactionRepository.saveAndFlush(transactionEntity);
                     if(transaction!=null && transaction.getIdTransaction()!=null){
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -145,7 +149,7 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
             if(transaction!=null && transaction.getIdTransaction()!=null){
                 Map<String, Object> data1 = new HashMap<>();
                 if (this.tiene24Horas(transaction.getTransactionDate())==false) {
-                    data1.put("mensaje","la transaction tiene mas de 24 horas , no se puede anular");
+                    data1.put("mensaje","La transacción tiene más de 24 horas, no se puede anular.");
                     Map<String, Object>  data = this.apiBuilderService.convertEntityToMapSinCambios(data1,"transaction_anuled");
                     return this.apiBuilderService.successRespuesta(data);
                 }else{
@@ -156,7 +160,7 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
                     card.setBalance(devolucion);
                     this.cardRepository.saveAndFlush(card);
                     TransactionEntity transactionEntity = transactionRepository.save(transaction);
-                    data1.put("mensaje","la transaction se anulo de forma correcta");
+                    data1.put("mensaje","La transacción se anuló de forma correcta.");
                     data1.put("anulation_date",this.parseDateFormat(new Date()));
                     Map<String, Object>  data = this.apiBuilderService.convertEntityToMapSinCambios(data1,"transaction_anuled");
                     return this.apiBuilderService.successRespuesta(data);

@@ -115,7 +115,7 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
                     Integer filasModificas = this.cardRepository.activeCard(idCard);
                     Map<String, Object> data1 = new HashMap<>();
                     if (filasModificas != null && filasModificas > 0) {
-                        data1.put("mensaje", "La tarjeta se activó con éxito");
+                        data1.put("mensaje", "La tarjeta se activó con éxito.");
                         Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(data1, "card_active");
                         data1.put("card", this.privateNumberCard(card.getIdCard()));
                         data1.put("activation_date", dateFormat.format(new Date()));
@@ -147,7 +147,7 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
                     if(filasModificas!=null && filasModificas>0){
                         String formattedDate = dateFormat.format(new Date());
                         Map<String, Object> data1 = new HashMap<>();
-                        data1.put("mensaje","la tarjeta se bloqueo con exito");
+                        data1.put("mensaje","La tarjeta se bloqueó con éxito.");
                         data1.put("card",this.privateNumberCard(card.getIdCard()));
                         data1.put("lockout_date",dateFormat.format(new Date()));
                         Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(data1,"card_blocked");
