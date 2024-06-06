@@ -21,15 +21,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CardService  extends  ValidationUtilCard  implements  ICardService  {
 
+/*
+    public final CardRepository cardRepository;
+    public final ResponseApiBuilderService apiBuilderService;
 
-    private final CardRepository cardRepository;
-    private final ResponseApiBuilderService apiBuilderService;
+ */
+    @Autowired
+    public CardRepository cardRepository;
 
+    @Autowired
+    public ResponseApiBuilderService apiBuilderService = new ResponseApiBuilderService();
+
+
+
+
+            /*
     @Autowired
     public CardService(CardRepository cardRepository, ResponseApiBuilderService apiBuilderService) {
         this.cardRepository = cardRepository;
         this.apiBuilderService = apiBuilderService;
     }
+*/
 
 
 

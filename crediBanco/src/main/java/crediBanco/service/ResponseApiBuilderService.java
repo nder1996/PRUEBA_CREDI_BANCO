@@ -19,8 +19,8 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
 
 
 
-    private final ValidationUtilCard validationUtilCard = new ValidationUtilCard();
-    private final ValidationUtilTransaction ValidationUtilTransaction = new ValidationUtilTransaction();
+    public final ValidationUtilCard validationUtilCard = new ValidationUtilCard();
+    public final ValidationUtilTransaction ValidationUtilTransaction = new ValidationUtilTransaction();
 
 
 
@@ -137,7 +137,33 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
     }
 
 
+    public String convertEntityToMapSinCambiosString(Object obj, String nameData) {
+        Map<String, Object> result = new HashMap<>();
 
+        if (obj instanceof List<?>) {
+            List<Map<String, Object>> dataList = new ArrayList<>();
+            for (Object entity : (List<?>) obj) {
+                dataList.add(convertSingleEntityToMapSinCambios(entity));
+            }
+            result.put(nameData, dataList);
+        } else if (obj instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            if (map.keySet().stream().allMatch(key -> key instanceof String) &&
+                    map.values().stream().allMatch(value -> value instanceof Object)) {
+                result.put(nameData, map);
+            }
+        } else {
+            result.put(nameData, convertSingleEntityToMapSinCambios(obj));
+        }
+
+        return result.toString();
+    }
+
+
+
+
+
+    @Override
     public Map<String, Object> convertEntityToMapSinCambios(Object obj, String nameData) {
         Map<String, Object> result = new HashMap<>();
 
