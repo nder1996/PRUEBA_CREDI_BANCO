@@ -1,6 +1,7 @@
 package crediBanco.service;
 
 
+import com.google.gson.JsonObject;
 import crediBanco.entity.CardEntity;
 import crediBanco.model.response.ApiResponse;
 
@@ -21,27 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CardService  extends  ValidationUtilCard  implements  ICardService  {
 
-/*
-    public final CardRepository cardRepository;
-    public final ResponseApiBuilderService apiBuilderService;
 
- */
     @Autowired
     public CardRepository cardRepository;
 
     @Autowired
-    public ResponseApiBuilderService apiBuilderService = new ResponseApiBuilderService();
+    private ResponseApiBuilderService apiBuilderService;
 
 
-
-
-            /*
-    @Autowired
-    public CardService(CardRepository cardRepository, ResponseApiBuilderService apiBuilderService) {
-        this.cardRepository = cardRepository;
-        this.apiBuilderService = apiBuilderService;
-    }
-*/
 
 
 
@@ -50,7 +38,7 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
         try {
             List<CardEntity> cardEntityList = this.cardRepository.findAll();
             if(cardEntityList!=null && !cardEntityList.isEmpty()){
-                Map<String, Object>  data = this.apiBuilderService.convertEntityToMapSinCambios(cardEntityList,"cards");
+                Map<String, Object>  data = this.apiBuilderService.converterAllMap(cardEntityList,"cards");
                 return this.apiBuilderService.successRespuesta(data);
             }else{
                 return this.apiBuilderService.errorRespuesta("NO_DATA_AVAILABLE");
@@ -68,7 +56,7 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
         try {
             CardEntity card  = this.cardRepository.findById(idCard).get();
             if(card!=null && card.getIdCard()!=null){
-                Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(card,"card");
+                Map<String, Object> data = this.apiBuilderService.converterAllMap(card,"card");
                 return this.apiBuilderService.successRespuesta(data);
             }else{
                 return this.apiBuilderService.errorRespuesta("INVALID_CARD_NUMBER");
@@ -97,14 +85,14 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
                     data = this.apiBuilderService.convertEntityToMapSinCambios(cardNew,"card");
                     return this.apiBuilderService.successRespuesta(data);
                 }else{
-                    return this.apiBuilderService.errorRespuesta("INTERNAL_SERVER_ERROR");
+                    return this.apiBuilderService.errorRespuesta("CARD_GENERATION_FAILED");
                 }
             }else{
-                return this.apiBuilderService.errorRespuesta("INTERNAL_SERVER_ERROR");
+                return this.apiBuilderService.errorRespuesta("CARD_GENERATION_FAILED");
             }
         }catch (Exception ex) {
             System.out.println(ex.getMessage());
-            return this.apiBuilderService.errorRespuesta("INTERNAL_SERVER_ERROR");
+            return this.apiBuilderService.errorRespuesta("CARD_GENERATION_FAILED");
         }
 
     }
@@ -242,7 +230,7 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
                 CardEntity card = this.cardRepository.findById(idCard).get();
                 if(card!=null && card.getIdCard()!=null){
                     card.setIdCard(this.privateNumberCard(idCard));
-                    Map<String, Object> data = this.apiBuilderService.convertEntityToMap(card,"card");
+                    Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(card,"card");
                     return this.apiBuilderService.successRespuesta(data);
                 }else{
                     return this.apiBuilderService.errorRespuesta("INVALID_FORMAT_INPUT");

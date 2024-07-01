@@ -48,7 +48,6 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
 
 
 
-
     @Override
     @Transactional
     public  ApiResponse<String> createTransactionCard(Map<String, Object> requestData){
@@ -82,7 +81,7 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
                         System.out.println("fecha transaction : "+this.parseDateFormat(transaction.getTransactionDate()));
                         TransactionDto transactionDto = new TransactionDto(transaction.getIdTransaction(),this.parseDateFormat(transaction.getTransactionDate()),transaction.getState(),
                                 this.validationUtilCard.privateNumberCard(transaction.getCard().getIdCard()),transaction.getPrice(),transaction.getCreatedAt(),transaction.getUpdatedAt());
-                        Map<String, Object> data = this.apiBuilderService.convertEntityToMap(transactionDto,"transaction");
+                        Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(transactionDto,"transaction");
                         return this.apiBuilderService.successRespuesta(data);
                     }else{
                         return this.apiBuilderService.errorRespuesta("ERROR_CREATE_TRANSACTION");
@@ -108,7 +107,7 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
                 TransactionEntity transaction = this.transactionRepository.findById(idTransaction).get();
                 if(transaction!=null && transaction.getIdTransaction()!=null){
                     TransactionDto transactionDto = new TransactionDto(transaction.getIdTransaction(),transaction.getTransactionDate(),transaction.getState(),this.validationUtilCard.privateNumberCard(transaction.getCard().getIdCard()),transaction.getPrice(),transaction.getCreatedAt(),transaction.getUpdatedAt());
-                    Map<String, Object> data = this.apiBuilderService.convertEntityToMap(transactionDto,"transaction");
+                    Map<String, Object> data = this.apiBuilderService.convertEntityToMapSinCambios(transactionDto,"transaction");
                     return this.apiBuilderService.successRespuesta(data);
                 }else{
                     return this.apiBuilderService.errorRespuesta("NO_DATA_AVAILABLE");
@@ -173,7 +172,6 @@ public class TransactionService extends ValidationUtilTransaction  implements IT
             return this.apiBuilderService.errorRespuesta("INTERNAL_SERVER_ERROR");
         }
     }
-
 
 
 

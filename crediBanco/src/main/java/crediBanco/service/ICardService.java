@@ -2,7 +2,7 @@ package crediBanco.service;
 
 import crediBanco.entity.CardEntity;
 import crediBanco.model.response.ApiResponse;
-import crediBanco.model.response.ApiResponseJson;
+
 
 import java.util.List;
 import java.util.Map;
