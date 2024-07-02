@@ -1,17 +1,13 @@
 package crediBanco.service;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 import crediBanco.model.response.ApiResponse;
 import crediBanco.model.response.ErrorDetailApiResponse;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -83,6 +79,7 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
         return response;
     }
 
+
     @Override
     public Map<String, Object> converterAllMap(Object obj, String nameData) {
         Gson gson = new Gson();
@@ -109,65 +106,26 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
 
 
 
+
     @Override
-    public Map<String, Object> convertEntityToMapSinCambios(Object obj, String nameData) {
-        Gson gson = new Gson();
-        Map<String, Object> map = new HashMap<>();
-        String json = gson.toJson(obj);
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        for (var entry : jsonObject.entrySet()) {
-            String key = entry.getKey();
-            JsonElement value = entry.getValue();
-            if ("state".equals(key)) {
-                String estado = value.getAsString();
-                String estadoConvertido = convertirEstado(estado);
-                jsonObject.addProperty(key, estadoConvertido);
-            }
+    public  <T> Map<String, Object> convertEntityToMapSinCambios(T objeto, String nameData) {
+        Map<String, Object> mapa = new HashMap<>();
+
+        if (objeto instanceof List<?>) {
+            List<?> lista = (List<?>) objeto;
+            mapa.put(nameData, lista);
+
+        } else {
+            // Si es un solo elemento, ponerlo directamente en el mapa
+            mapa.put(nameData, objeto);
         }
 
-
-
-
-
-
-        /* JsonElement jsonElement = gson.fromJson(json, JsonElement.class);*/
-
-
-        return Map.of();
+        return mapa;
     }
 
 
-    /*   public Map<String, Object> convertEntityToMapSinCambios(Object obj, String nameData) {
-           Gson gson = new Gson();
-           String json = gson.toJson(obj);
-           Map<String, Object> map = new HashMap<>();
 
-           // Convertir el objeto a un JsonElement
-           JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
-
-           if (jsonElement.isJsonArray()) {
-               JsonArray jsonArray = jsonElement.getAsJsonArray();
-               map.put(nameData, gson.fromJson(jsonArray, Object.class));
-           } else if (jsonElement.isJsonObject()) {
-               JsonObject jsonObject = jsonElement.getAsJsonObject();
-               for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                   String key = entry.getKey();
-                   JsonElement value = entry.getValue();
-                   // Aplicar reglas de exclusión y conversión
-                   if (!shouldExcludeField(key) && !shouldExcludeFieldFecha(key)) {
-                       if ("state".equals(key)) {
-                           map.put(key, convertirEstado(value.getAsString()));
-                       } else {
-                           map.put(key, gson.fromJson(value, Object.class));
-                       }
-                   }
-               }
-           }
-
-           return map;
-       }
-   */
-    public boolean shouldExcludeField(String fieldName) {
+    public static boolean shouldExcludeField(String fieldName) {
         return "expirationDate".equals(fieldName) || "state".equals(fieldName)
                 || "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
     }
@@ -176,7 +134,7 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
         return "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
     }
 
-    public String convertirEstado(String estado) {
+    public static String convertirEstado(String estado) {
         switch (estado) {
             case "I":
                 return "INACTIVO";
@@ -194,70 +152,38 @@ public class ResponseApiBuilderService implements IResponseApiBuilderService{
     }
 
 
-    /*
-    public Map<String, Object> convertEntityToMapSinCambios(Object obj, String nameData) {
-        // Convertir el objeto en un mapa usando Gson
-        Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        Map<String, Object> map = gson.fromJson(gson.toJson(obj), type);
 
-        // Aplicar reglas adicionales
-        for (Field field : obj.getClass().getDeclaredFields()) {
-            field.setAccessible(true); // Permitir acceso a campos privados
+    @Override
+    // Método para convertir un objeto en un Map<String, Object>
+    public  <T> Map<String, Object> convertirObjetoAMap(T objeto,String nameData) {
+        Map<String, Object> mapa = new HashMap<>();
+        // Obtener todos los campos declarados de la clase del objeto
+        Field[] campos = objeto.getClass().getDeclaredFields();
+        for (Field campo : campos) {
+            campo.setAccessible(true); // Hacer accesible el campo, incluso si es privado
+            // Obtener el nombre y el valor del campo
+            String nombreCampo = campo.getName();
+            Object valorCampo;
             try {
-                String fieldName = field.getName();
-                if (shouldExcludeField(fieldName)) {
-                    map.remove(fieldName);
-                } else {
-                    Object value = field.get(obj);
-                    if (value != null && shouldExcludeFieldFecha(fieldName)) {
-                        // Excluir campos de fecha si están presentes
-                        map.remove(fieldName);
-                    } else if ("state".equals(fieldName)) {
-                        // Convertir estado si es el campo "state"
-                        map.put(fieldName, convertirEstado((String) value));
-                    }
-                }
+                valorCampo = campo.get(objeto);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                valorCampo = null; // Manejar la excepción según sea necesario
+            }
+
+            // Aplicar lógica de exclusión y conversión si es necesario
+            if (!shouldExcludeField(nombreCampo)) {
+                // Aplicar lógica de conversión de estado si el campo es "state"
+                if ("state".equals(nombreCampo) && valorCampo instanceof String) {
+                    valorCampo = convertirEstado((String) valorCampo);
+                }
+                // Poner el nombre del campo y su valor en el mapa
+                mapa.put(nameData, valorCampo);
             }
         }
 
-        // Agregar el nombre al mapa
-        map.put("name", nameData);
-
-        return map;
+        return mapa;
     }
 
-*/
-/*
-    public  boolean shouldExcludeField(String fieldName) {
-        return "expirationDate".equals(fieldName) || "state".equals(fieldName)
-                || "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
-    }
-
-    public  boolean shouldExcludeFieldFecha(String fieldName) {
-        return  "createdAt".equals(fieldName) || "updatedAt".equals(fieldName);
-    }
-
-
-    public String convertirEstado(String estado) {
-        switch (estado) {
-            case "I":
-                return "INACTIVO";
-            case "A":
-                return "ACTIVO";
-            case "B":
-                return "BLOQUEADO";
-            case "S":
-                return "ACTIVO";
-            case "N":
-                return "ANULADO";
-            default:
-                return estado;
-        }
-    }
-
-*/
 
 
 }

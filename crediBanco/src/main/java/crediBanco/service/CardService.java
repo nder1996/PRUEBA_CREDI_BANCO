@@ -38,8 +38,9 @@ public class CardService  extends  ValidationUtilCard  implements  ICardService 
         try {
             List<CardEntity> cardEntityList = this.cardRepository.findAll();
             if(cardEntityList!=null && !cardEntityList.isEmpty()){
-                Map<String, Object>  data = this.apiBuilderService.converterAllMap(cardEntityList,"cards");
-                return this.apiBuilderService.successRespuesta(data);
+                Map<String, Object>  data = this.apiBuilderService.convertirObjetoAMap(cardEntityList,"cards");
+                ApiResponse<String> cards = this.apiBuilderService.successRespuesta(data);
+                return cards;
             }else{
                 return this.apiBuilderService.errorRespuesta("NO_DATA_AVAILABLE");
             }
